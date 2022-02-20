@@ -32,7 +32,7 @@ object validator {
           name.pure[F]
         else A.raiseError(mkError(InvalidFirstName))
     def validateLastName(lastname: String): F[String] =
-      if (lastname.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
+      if (lastname.matches("(?i:^[a-z][a-z ,.'-]*$)"))
         lastname.pure[F]
       else A.raiseError(mkError(InvalidLastName))
 
