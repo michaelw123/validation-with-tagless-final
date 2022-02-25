@@ -8,38 +8,43 @@ object TestValidation extends App {
   def testOption = {
     implicit val userValidatorInterpreter = userValidatorOptionInterpreter
     println("Test Option")
-    println(UserValidator.validate("John", "Doe", 20))
-    println(UserValidator.validate("John", "Doe", 25 ))
-    println(UserValidator.validate("John", "Doe", -1 ))
-    println(UserValidator.validate(".John", "Doe", -1))
+    println(UserValidator.validate("John", "123-456-7890", 20))
+    println(UserValidator.validate("John", "123-456-7890", 25 ))
+    println(UserValidator.validate("John", "123-456-7890", -1 ))
+    println(UserValidator.validate(".John", "123-456-789", -1))
     println
   }
   def testTry = {
     implicit val userValidatorInterpreter = userValidatorTryInterpreter
-    println(UserValidator.validate("John", "Doe", 20))
-    println(UserValidator.validate("John", "Doe", 25 ))
-    println(UserValidator.validate("John", "Doe", -1 ))
-    println(UserValidator.validate(".John", "Doe", -1))
+    println("Test Try")
+    println(UserValidator.validate("John", "123-456-7890", 20))
+    println(UserValidator.validate("John", "123-456-7890", 25 ))
+    println(UserValidator.validate("John", "123-456-7890", -1 ))
+    println(UserValidator.validate(".John", "123-456-789", -1))
     println
   }
   def testEither = {
     implicit val userValidatorInterpreter = userValidatorEitherInterpreter
-    println(UserValidator.validate("John", "Doe", 20))
-    println(UserValidator.validate("John", "Doe", 25 ))
-    println(UserValidator.validate("John", "Doe", -1 ))
-    println(UserValidator.validate(".John", "Doe", -1))
+    println("Test Either")
+    println(UserValidator.validate("John", "123-456-7890", 20))
+    println(UserValidator.validate("John", "123-456-7890", 25 ))
+    println(UserValidator.validate("John", "123-456-7890", -1 ))
+    println(UserValidator.validate(".John", "123-456-789", -1))
     println
   }
   def testValidated = {
     implicit val userValidatorInterpreter = userValidatorValidaedInterpreter
-    println(UserValidator.validate("John", "Doe", 20))
-    println(UserValidator.validate("John", "Doe", 25 ))
-    println(UserValidator.validate("John", "Doe.", -1 ))
-    println(UserValidator.validate(".John", "Doe", -1))
+    println("Test Validated")
+    println(UserValidator.validate("John", "123-456-7890", 20))
+    println(UserValidator.validate("John", "123-456-7890", 25 ))
+    println(UserValidator.validate("John", "123-456-7890.", -1 ))
+    println(UserValidator.validate(".John", "123-456-789", -1))
     println
   }
+
   testOption
   testTry
   testEither
   testValidated
+
 }

@@ -27,14 +27,14 @@ object validator {
 
   def userValidator[F[_], E](mkError: UserError => E)
                             (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
-      def validateFirstName(name: String): F[String] =
+      def validateName(name: String): F[String] =
         if (name.matches("(?i:^[a-z][a-z ,.'-]*$)"))
           name.pure[F]
-        else A.raiseError(mkError(InvalidFirstName))
-    def validateLastName(lastname: String): F[String] =
-      if (lastname.matches("(?i:^[a-z][a-z ,.'-]*$)"))
+        else A.raiseError(mkError(InvalidName))
+    def validatePhoneNumber(lastname: String): F[String] =
+      if (lastname.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
         lastname.pure[F]
-      else A.raiseError(mkError(InvalidLastName))
+      else A.raiseError(mkError(InvalidPhoneNumber))
 
 
     def validateAge(age: Int): F[Int] =
@@ -44,8 +44,8 @@ object validator {
 
     def createValidUser(firstname: String, lastname: String, age: Int): F[User] = {
         (User.apply _).curried.pure[F] <*>
-          validateFirstName(firstname) <*>
-          validateLastName(lastname) <*>
+          validateName(firstname) <*>
+          validatePhoneNumber(lastname) <*>
           validateAge(age)
       }
     }
