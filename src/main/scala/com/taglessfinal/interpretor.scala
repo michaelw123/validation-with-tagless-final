@@ -10,6 +10,16 @@ object interpretor {
 
   val userValidatorOptionInterpreter =
     userValidator[Option, Unit](_ => ())
+//      {
+//       def createValidUser(name: String, phone: String, age: Int): Option[User]
+//       = {
+//        for {
+//          name <- validateName(name)
+//          phone <- validatePhoneNumber(phone)
+//          age <- validateAge(age)
+//        } yield (User(name, phone, age))
+//      }
+//    }
 
   val userValidatorTryInterpreter =
     userValidator[Try, Throwable](err => new Throwable(err.toString))

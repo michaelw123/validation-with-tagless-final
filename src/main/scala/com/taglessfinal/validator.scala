@@ -1,12 +1,7 @@
 package com.taglessfinal
 
 import cats._
-import cats.data._
 import cats.implicits._
-import cats.data.Validated._
-
-import scala.util.Try
-
 
 object validator {
   trait UserValidator[F[_]] {
@@ -42,10 +37,10 @@ object validator {
         else A.raiseError(mkError(InvalidAge))
 
 
-    def createValidUser(firstname: String, lastname: String, age: Int): F[User] = {
+    def createValidUser(name: String, phone: String, age: Int): F[User] = {
         (User.apply _).curried.pure[F] <*>
-          validateName(firstname) <*>
-          validatePhoneNumber(lastname) <*>
+          validateName(name) <*>
+          validatePhoneNumber(phone) <*>
           validateAge(age)
       }
     }
