@@ -14,15 +14,14 @@ object validator {
       UserValidator[F].createValidUser(firstname, lastname, age)
   }
 
-  val userValidatorIdInterpreter = new UserValidator[Id] {
+   val userValidatorIdInterpreter = new UserValidator[Id] {
     def createValidUser(firstname: String, lastname: String, age: Int): Id[User]
       = User(firstname, lastname, age)
   }
-  implicit val userValidatorInterpreter = userValidatorIdInterpreter
 
   def userValidator[F[_], E](mkError: UserError => E)
                             (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
-      def validateName(name: String): F[String] =
+    def validateName(name: String): F[String] =
         if (name.matches("(?i:^[a-z][a-z ,.'-]*$)"))
           name.pure[F]
         else A.raiseError(mkError(InvalidName))
