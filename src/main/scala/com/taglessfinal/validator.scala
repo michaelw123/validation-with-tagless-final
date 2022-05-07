@@ -5,17 +5,17 @@ import cats.implicits._
 
 object validator {
   trait UserValidator[F[_]] {
-    def createValidUser(firstname: String, lastname: String, age: Int): F[User]
+    def validate(firstname: String, lastname: String, age: Int): F[User]
   }
 
   object UserValidator {
     def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
     def validate[F[_] : UserValidator, E](firstname: String, lastname: String, age: Int): F[User] =
-      UserValidator[F].createValidUser(firstname, lastname, age)
+      UserValidator[F].validate(firstname, lastname, age)
   }
 
    val userValidatorIdInterpreter = new UserValidator[Id] {
-    def createValidUser(firstname: String, lastname: String, age: Int): Id[User]
+    def validate(firstname: String, lastname: String, age: Int): Id[User]
       = User(firstname, lastname, age)
   }
 
@@ -36,7 +36,7 @@ object validator {
         else A.raiseError(mkError(InvalidAge))
 
 
-    def createValidUser(name: String, phone: String, age: Int): F[User] = {
+    def validate(name: String, phone: String, age: Int): F[User] = {
         (User.apply _).curried.pure[F] <*>
           validateName(name) <*>
           validatePhoneNumber(phone) <*>
