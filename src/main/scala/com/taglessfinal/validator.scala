@@ -5,18 +5,18 @@ import cats.implicits._
 
 object validator {
   trait UserValidator[F[_]] {
-    def validate(firstname: String, lastname: String, age: Int): F[User]
+    def validate(name:String, age: Int): F[User]
   }
 
   object UserValidator {
     def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
-    def validate[F[_] : UserValidator, E](firstname: String, lastname: String, age: Int): F[User] =
-      UserValidator[F].validate(firstname, lastname, age)
+    def validate[F[_] : UserValidator, E](name:String, age: Int): F[User] =
+      UserValidator[F].validate(name, age)
   }
 
    val userValidatorIdInterpreter = new UserValidator[Id] {
-    def validate(firstname: String, lastname: String, age: Int): Id[User]
-      = User(firstname, lastname, age)
+    def validate(name: String, age: Int): Id[User]
+      = User(name, age)
   }
 
   def userValidator[F[_], E](mkError: UserError => E)
@@ -25,10 +25,10 @@ object validator {
         if (name.matches("(?i:^[a-z][a-z ,.'-]*$)"))
           name.pure[F]
         else A.raiseError(mkError(InvalidName))
-    def validatePhoneNumber(lastname: String): F[String] =
-      if (lastname.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
-        lastname.pure[F]
-      else A.raiseError(mkError(InvalidPhoneNumber))
+//    def validatePhoneNumber(lastname: String): F[String] =
+//      if (lastname.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
+//        lastname.pure[F]
+//      else A.raiseError(mkError(InvalidPhoneNumber))
 
 
     def validateAge(age: Int): F[Int] =
@@ -36,10 +36,9 @@ object validator {
         else A.raiseError(mkError(InvalidAge))
 
 
-    def validate(name: String, phone: String, age: Int): F[User] = {
+    def validate(name: String, age: Int): F[User] = {
         (User.apply _).curried.pure[F] <*>
           validateName(name) <*>
-          validatePhoneNumber(phone) <*>
           validateAge(age)
       }
     }
