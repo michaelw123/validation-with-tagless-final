@@ -1,7 +1,7 @@
 package com.taglessfinal
 
 import cats.data.{NonEmptyList, Validated}
-import validator._
+import ValidationWithTaglessFinal._
 
 import scala.util.Try
 //import cats._

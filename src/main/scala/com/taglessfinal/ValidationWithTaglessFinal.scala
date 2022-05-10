@@ -3,7 +3,7 @@ package com.taglessfinal
 import cats._
 import cats.implicits._
 
-object validator {
+object ValidationWithTaglessFinal {
   trait UserValidator[F[_]] {
     def validate(user:User):F[User]
   }
