@@ -8,20 +8,11 @@ import scala.util.Try
 
 object validator {
   trait UserValidator[F[_]] {
-    def validateName(user: User): F[String]
-    def validateAge(user: User): F[Int]
-    def validatePhone(user: User): F[String]
-    def validateEmail(user: User): F[String]
     def validate(user:User):F[User]
   }
 
   object UserValidator {
     def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
-    def validateName[F[_] : UserValidator, E](user: User): F[String] = UserValidator[F].validateName(user)
-    def validateAge[F[_] : UserValidator, E](user: User): F[Int] = UserValidator[F].validateAge(user)
-    def validatePhone[F[_] : UserValidator, E](user: User): F[String] = UserValidator[F].validatePhone(user)
-    def validateEmail[F[_] : UserValidator, E](user: User): F[String] = UserValidator[F].validateEmail(user)
-
     def validate[F[_]: UserValidator, E](user:User):F[User] = UserValidator[F].validate(user)
   }
 
