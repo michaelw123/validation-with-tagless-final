@@ -18,22 +18,22 @@ object validator {
 
   def userValidator[F[_], E](mkError: UserError => E)
                             (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
-    def validateName(user: User): F[String] =
-      if (user.name.matches("(?i:^[a-z][a-z ,.'-]*$)"))
+    def validateName(user: User): F[Name] =
+      if (user.name.value.matches("(?i:^[a-z][a-z ,.'-]*$)"))
         user.name.pure[F]
       else A.raiseError(mkError(InvalidName))
 
-    def validatePhone(user: User): F[String] =
-      if (user.phone.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
+    def validatePhone(user: User): F[Phone] =
+      if (user.phone.value.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
         user.phone.pure[F]
       else A.raiseError(mkError(InvalidPhoneNumber))
 
-    def validateAge(user: User): F[Int] =
-      if (user.age >= 18 && user.age < 120) user.age.pure[F]
+    def validateAge(user: User): F[Age] =
+      if (user.age.value >= 18 && user.age.value < 120) user.age.pure[F]
       else A.raiseError(mkError(InvalidAge))
 
-    def validateEmail(user: User): F[String] =
-      if (user.email.matches("^\\S+@\\S+$")) user.email.pure[F]
+    def validateEmail(user: User): F[Email] =
+      if (user.email.value.matches("^\\S+@\\S+$")) user.email.pure[F]
       else A.raiseError(mkError(InvalidEmail))
 
 
@@ -63,6 +63,8 @@ object validator {
       interpreter.validate(user)
     }
   }
+  type ValidatedNel[E, A] = Validated[NonEmptyList[E], A]
+  type ValidatedResult[A] = ValidatedNel[UserError, A]
   implicit class UserValidatorValidated(user:User) {
     def validate:Validated[NonEmptyList[UserError], User] = {
       val interpreter = userValidator[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil))
