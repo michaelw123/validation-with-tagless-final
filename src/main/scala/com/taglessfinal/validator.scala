@@ -63,8 +63,6 @@ object validator {
       interpreter.validate(user)
     }
   }
-  type ValidatedNel[E, A] = Validated[NonEmptyList[E], A]
-  type ValidatedResult[A] = ValidatedNel[UserError, A]
   implicit class UserValidatorValidated(user:User) {
     def validate:Validated[NonEmptyList[UserError], User] = {
       val interpreter = userValidator[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil))
