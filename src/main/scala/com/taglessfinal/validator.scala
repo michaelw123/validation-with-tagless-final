@@ -13,7 +13,6 @@ object validator {
 
   object UserValidator {
     def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
-    def validate[F[_]: UserValidator](user:User):F[User] = UserValidator[F].validate(user)
   }
 
   def userValidator[F[_], E](mkError: UserError => E)
