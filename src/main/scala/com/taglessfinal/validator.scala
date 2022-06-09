@@ -11,9 +11,9 @@ object validator {
     def validate(user:User):F[User]
   }
 
-  object UserValidator {
-    def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
-  }
+//  object UserValidator {
+//    def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
+//  }
 
   def userValidator[F[_], E](mkError: UserError => E)
                             (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
@@ -44,29 +44,23 @@ object validator {
         validateAge(user)
     }
   }
-  implicit class UserValidatorOption(user:User) {
-    def validate:Option[User] = {
-      val interpreter = userValidator[Option, Unit](_ => ())
-      interpreter.validate(user)
-    }
+  implicit class userValidatorOptionInterpreter(user:User) {
+    def validate:Option[User] = userValidator[Option, Unit](_ => ())
+      .validate(user)
   }
-  implicit class UserValidatorTry(user:User) {
-    def validate:Try[User] = {
-      val interpreter = userValidator[Try, Throwable](err => new Throwable(err.toString))
-      interpreter.validate(user)
-    }
+  implicit class userValidatorTryInterpreter(user:User) {
+    def validate:Try[User] = userValidator[Try, Throwable](err => new Throwable(err.toString))
+      .validate(user)
+
   }
-  implicit class UserValidatorEither(user:User) {
-    def validate:Either[UserError, User] = {
-      val interpreter = userValidator[Either[UserError, *], UserError](identity)
-      interpreter.validate(user)
-    }
+  implicit class userValidatorEitherInterpreter(user:User) {
+    def validate:Either[UserError, User] = userValidator[Either[UserError, *], UserError](identity)
+      .validate(user)
   }
-  implicit class UserValidatorValidated(user:User) {
-    def validate:Validated[NonEmptyList[UserError], User] = {
-      val interpreter = userValidator[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil))
-      interpreter.validate(user)
-    }
+  implicit class userValidatorValidatedInterpreter(user:User) {
+    def validate:Validated[NonEmptyList[UserError], User] =
+      userValidator[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil))
+      .validate(user)
   }
 }
 

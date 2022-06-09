@@ -7,7 +7,7 @@ object Program extends App {
   val user4 = User(Name(".John"),  Phone("123-456-789"), Email("ab.com"),Age(-1))
 
   def withOption:Unit = {
-    import com.taglessfinal.validator.UserValidatorOption
+    import com.taglessfinal.validator.userValidatorOptionInterpreter
 
     println("Test Option")
     println(user1.validate)
@@ -17,7 +17,7 @@ object Program extends App {
     println
   }
   def withTry:Unit = {
-    import com.taglessfinal.validator.UserValidatorTry
+    import com.taglessfinal.validator.userValidatorTryInterpreter
 
     println("Test Try")
     println(user1.validate)
@@ -27,7 +27,7 @@ object Program extends App {
     println
   }
   def withEither:Unit = {
-    import com.taglessfinal.validator.UserValidatorEither
+    import com.taglessfinal.validator.userValidatorEitherInterpreter
 
     println("Test Either")
     println(user1.validate)
@@ -37,7 +37,7 @@ object Program extends App {
     println
   }
   def withValidated:Unit = {
-    import com.taglessfinal.validator.UserValidatorValidated
+    import com.taglessfinal.validator.userValidatorValidatedInterpreter
 
     println("Test Validated")
     println(user1.validate)
