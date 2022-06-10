@@ -11,37 +11,33 @@ object validator {
     def validate(user:User):F[User]
   }
 
-//  object UserValidator {
-//    def apply[F[_]](implicit ev: UserValidator[F]): UserValidator[F] = ev
-//  }
-
   def userValidator[F[_], E](mkError: UserError => E)
                             (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
-    def validateName(user: User): F[Name] =
-      if (user.name.value.matches("(?i:^[a-z][a-z ,.'-]*$)"))
-        user.name.pure[F]
+    def validateName(name: Name): F[Name] =
+      if (name.value.matches("(?i:^[a-z][a-z ,.'-]*$)"))
+        name.pure[F]
       else A.raiseError(mkError(InvalidName))
 
-    def validatePhone(user: User): F[Phone] =
-      if (user.phone.value.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
-        user.phone.pure[F]
+    def validatePhone(phone: Phone): F[Phone] =
+      if (phone.value.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
+        phone.pure[F]
       else A.raiseError(mkError(InvalidPhoneNumber))
 
-    def validateAge(user: User): F[Age] =
-      if (user.age.value >= 18 && user.age.value < 120) user.age.pure[F]
+    def validateAge(age: Age): F[Age] =
+      if (age.value >= 18 && age.value < 120) age.pure[F]
       else A.raiseError(mkError(InvalidAge))
 
-    def validateEmail(user: User): F[Email] =
-      if (user.email.value.matches("^\\S+@\\S+$")) user.email.pure[F]
+    def validateEmail(email: Email): F[Email] =
+      if (email.value.matches("^\\S+@\\S+$")) email.pure[F]
       else A.raiseError(mkError(InvalidEmail))
 
 
     def validate(user: User): F[User] = {
       (User.apply _).curried.pure[F] <*>
-        validateName(user) <*>
-        validatePhone(user) <*>
-        validateEmail(user) <*>
-        validateAge(user)
+        validateName(user.name) <*>
+        validatePhone(user.phone) <*>
+        validateEmail(user.email) <*>
+        validateAge(user.age)
     }
   }
   implicit class userValidatorOptionInterpreter(user:User) {
@@ -51,7 +47,6 @@ object validator {
   implicit class userValidatorTryInterpreter(user:User) {
     def validate:Try[User] = userValidator[Try, Throwable](err => new Throwable(err.toString))
       .validate(user)
-
   }
   implicit class userValidatorEitherInterpreter(user:User) {
     def validate:Either[UserError, User] = userValidator[Either[UserError, *], UserError](identity)
