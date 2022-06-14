@@ -1,4 +1,5 @@
 package com.taglessfinal
+import scala.util.chaining._
 
 object Program extends App {
   val user1 = User(Name("John"), Phone("123-456-7890"), Email("a@b.com"), Age(20))
@@ -10,40 +11,40 @@ object Program extends App {
     import com.taglessfinal.validator.userValidatorOptionInterpreter
 
     println("Test Option")
-    println(user1.validate)
-    println(user2.validate)
-    println(user3.validate)
-    println(user4.validate)
+    user1.validate.tap(println)
+    user2.validate.tap(println)
+    user3.validate.tap(println)
+    user4.validate.tap(println)
     println
   }
   def withTry:Unit = {
     import com.taglessfinal.validator.userValidatorTryInterpreter
 
     println("Test Try")
-    println(user1.validate)
-    println(user2.validate)
-    println(user3.validate)
-    println(user4.validate)
+    user1.validate.tap(println)
+    user2.validate.tap(println)
+    user3.validate.tap(println)
+    user4.validate.tap(println)
     println
   }
   def withEither:Unit = {
     import com.taglessfinal.validator.userValidatorEitherInterpreter
 
     println("Test Either")
-    println(user1.validate)
-    println(user2.validate)
-    println(user3.validate)
-    println(user4.validate)
+    user1.validate.tap(println)
+    user2.validate.tap(println)
+    user3.validate.tap(println)
+    user4.validate.tap(println)
     println
   }
   def withValidated:Unit = {
     import com.taglessfinal.validator.userValidatorValidatedInterpreter
 
     println("Test Validated")
-    println(user1.validate)
-    println(user2.validate)
-    println(user3.validate)
-    println(user4.validate)
+    user1.validate.tap(println)
+    user2.validate.tap(println)
+    user3.validate.tap(println)
+    user4.validate.tap(println)
     println
   }
   withOption
