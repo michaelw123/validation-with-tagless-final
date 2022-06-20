@@ -8,54 +8,54 @@ import scala.util.Try
 
 object validator {
   trait UserValidator[F[_]] {
-    def validate(user:User):F[User]
+    def validate:F[User]
   }
-
-  def userValidator[F[_], E](mkError: UserError => E)
-                            (implicit A: ApplicativeError[F, E]): UserValidator[F] = new UserValidator[F] {
-    def validateName(name: Name): F[Name] =
+  case class UserValidatioInterpreter[F[_], E](mkError: UserError => E)(implicit A: ApplicativeError[F, E]) {
+    def validateName(name: Name)(implicit A: ApplicativeError[F, E]): F[Name] =
       if (name.value.matches("(?i:^[a-z][a-z ,.'-]*$)"))
         name.pure[F]
       else A.raiseError(mkError(InvalidName))
 
-    def validatePhone(phone: Phone): F[Phone] =
+    def validatePhone(phone: Phone)(implicit A: ApplicativeError[F, E]): F[Phone] =
       if (phone.value.matches("^[1-9]\\d{2}-\\d{3}-\\d{4}"))
         phone.pure[F]
       else A.raiseError(mkError(InvalidPhoneNumber))
 
-    def validateAge(age: Age): F[Age] =
+    def validateAge(age: Age)(implicit A: ApplicativeError[F, E]): F[Age] =
       if (age.value >= 18 && age.value < 120) age.pure[F]
       else A.raiseError(mkError(InvalidAge))
 
-    def validateEmail(email: Email): F[Email] =
+    def validateEmail(email: Email)(implicit A: ApplicativeError[F, E]): F[Email] =
       if (email.value.matches("^\\S+@\\S+$")) email.pure[F]
       else A.raiseError(mkError(InvalidEmail))
 
-
-    def validate(user: User): F[User] = {
-      (User.apply _).curried.pure[F] <*>
-        validateName(user.name) <*>
-        validatePhone(user.phone) <*>
-        validateEmail(user.email) <*>
-        validateAge(user.age)
+    def interpreter: User => F[User] = { user => {
+        (User.apply _).curried.pure[F] <*>
+          validateName(user.name) <*>
+          validatePhone(user.phone) <*>
+          validateEmail(user.email) <*>
+          validateAge(user.age)
+      }
     }
   }
-  implicit class userValidatorOptionInterpreter(user:User) {
-    def validate:Option[User] = userValidator[Option, Unit](_ => ())
-      .validate(user)
+
+  implicit class userValidatorOptionInterpreter(user:User) extends UserValidator[Option] {
+    val interpreter = UserValidatioInterpreter[Option, Unit](_ => ()).interpreter
+    override def validate = interpreter(user)
   }
-  implicit class userValidatorTryInterpreter(user:User) {
-    def validate:Try[User] = userValidator[Try, Throwable](err => new Throwable(err.toString))
-      .validate(user)
+  implicit class userValidatorTryInterpreter(user:User) extends UserValidator[Try]  {
+    val interpreter = UserValidatioInterpreter[Try, Throwable](err => new Throwable(err.toString)).interpreter
+    override def validate = interpreter(user)
+
   }
-  implicit class userValidatorEitherInterpreter(user:User) {
-    def validate:Either[UserError, User] = userValidator[Either[UserError, *], UserError](identity)
-      .validate(user)
+  implicit class userValidatorEitherInterpreter(user:User) extends UserValidator[Either[UserError, *]]  {
+    val interpreter = UserValidatioInterpreter[Either[UserError, *], UserError](identity).interpreter
+    override def validate = interpreter(user)
+
   }
-  implicit class userValidatorValidatedInterpreter(user:User) {
-    def validate:Validated[NonEmptyList[UserError], User] =
-      userValidator[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil))
-      .validate(user)
+  implicit class userValidatorValidatedInterpreter(user:User) extends UserValidator[Validated[NonEmptyList[UserError], *]]{
+    val interpreter = UserValidatioInterpreter[Validated[NonEmptyList[UserError], *], NonEmptyList[UserError]](NonEmptyList(_, Nil)).interpreter
+    override def validate = interpreter(user)
   }
 }
 
