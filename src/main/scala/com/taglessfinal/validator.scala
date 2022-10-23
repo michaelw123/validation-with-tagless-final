@@ -7,7 +7,10 @@ import cats.implicits._
 import scala.util.Try
 
 object validator {
-  trait UserValidator[F[_]] {
+  trait Validator[F[_], A] {
+    def validate:F[A]
+  }
+  trait UserValidator[F[_]] extends  Validator[F, User] {
     def validate:F[User]
   }
   case class UserValidatioInterpreter[F[_], E](mkError: UserError => E)(implicit A: ApplicativeError[F, E]) {
